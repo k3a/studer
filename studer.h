@@ -8,6 +8,9 @@
 #ifndef __iot__studer__
 #define __iot__studer__
 
+#include <stdbool.h>
+#include <stdint.h>
+
 // destinations
 #define DEST_XTM(idx)       (101+idx)   // XTH/XTM inverter
 #define DEST_MPPT(idx)      (301+idx)   // MPPT solar controller
@@ -212,6 +215,6 @@ void studer_send_data(uint16_t dest, uint8_t service_id, uint16_t object_type, u
 void studer_send(uint16_t dest, uint8_t service_id, uint16_t object_type, uint32_t object_id, uint16_t property_id);
 
 // receive a response from Studer interface
-BOOL studer_recv(void* mem, uint16_t len);
+bool studer_recv(void* mem, uint16_t len);
 
 #endif /*__iot__studer__*/

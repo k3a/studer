@@ -5,7 +5,12 @@
 //  Released under MIT
 //
 
-#include "utils.h"
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "serial.h"
 #include "studer.h"
 
@@ -86,7 +91,7 @@ void studer_send_data(uint16_t dest, uint8_t service_id, uint16_t object_type, u
         return;
     }
     
-    StuderBody b;
+    StuderBody b; 
     b.flags = 0;
     b.service_id = service_id;
     b.object_type = object_type;
@@ -109,7 +114,7 @@ void studer_send(uint16_t dest, uint8_t service_id, uint16_t object_type, uint32
 {
     studer_send_data(dest, service_id, object_type, object_id, property_id, NULL, 0);
 }
-
+ 
 static bool studer_recv_with_body(void* mem, uint16_t len, StuderBody* ret_body)
 {
     uint16_t sum;
@@ -121,7 +126,7 @@ static bool studer_recv_with_body(void* mem, uint16_t len, StuderBody* ret_body)
     StuderBody b;
     
 AGAIN:
-    
+     
     // skip input until 0xAA is received
     serial_skip(0xAA); // normally should skip only this first 0xAA byte
     
@@ -178,7 +183,7 @@ AGAIN:
     if (computedSum != sum)
     {
         printf("Wrong body checksum: 0x%X (computed) != 0x%X (received)\n", computedSum, sum);
-        if (mem) emset(mem, 0, len); // zero memory
+        if (mem) memset(mem, 0, len); // zero memory
         free(recv);
         return false;
     }
