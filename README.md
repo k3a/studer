@@ -1,6 +1,7 @@
 # Studer Solar Equipment Protcol Implementation
 
 This code implements a serial protocol used in Xcom-232i from Studer Innotec. 
+When seen as textual data, Studer protocol looks like AA3650001000E0762A2110BDB00100000CCF2.
 
 The code was created according to their protocol documentation http://www.studer-innotec.com/media/document/0/xcom_232i_user_manual_en.pdf and was used in a working project.
 
@@ -37,3 +38,4 @@ void serial_skip(unsigned char b);
 #### Notes
 
 It was taken from a working project but cleaned by hand. If you find a problem or you have a suggestion, please open a pull request. Thanks.
+
