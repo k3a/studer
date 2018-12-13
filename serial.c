@@ -1,5 +1,9 @@
-// example serial IO implementation
-// parts taken from https://stackoverflow.com/a/6947758/314437
+//
+//  UNIX Serial Port Interface
+//
+//  Created by K3A (www.k3a.me) on 13.12.2018.
+//  Released under MIT
+//
 
 #include "serial.h"
 

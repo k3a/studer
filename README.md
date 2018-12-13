@@ -22,18 +22,21 @@ if (studer_recv_check(&float_val, 4, objID)) {
 
 #### Serial IO:
 You need to provide serial port functions.
+An example implementation for Linux/BSD is provided.
 
 ```c
 #define SERIAL_OK 0
 typedef unsigned serial_ret_t;
 
 // write to serial port size bytes from ptr
-void serial_write(const void* ptr, unsigned size);
+// returns number of bytes read or negative number indicating an error
+int serial_write(const void* ptr, unsigned size);
+
 // read size bytes from serial into ptr buffer
 serial_ret_t serial_read(void* ptr, unsigned size);
+
 // read and skip bytes until your receive a byte b. Skip this byte as well and return. 
 void serial_skip(unsigned char b);
-
 ```
 
 #### Notes
