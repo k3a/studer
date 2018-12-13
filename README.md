@@ -9,13 +9,14 @@ Sharing it for use by others. Released under MIT license.
 
 #### Usage:
 ```c
-// send the request for AC voltage
-studer_send(DEST_XTM(0), SVC_READ_PROPERTY, OT_SYSTEM_STATE, OI_IN_AC_VOLT, PI_VALUE);
+// input ac voltage command
+int objID = OI_IN_AC_VOLT;
+studer_send(DEST_XTM(0), SVC_READ_PROPERTY, OT_SYSTEM_STATE, objID, PI_VALUE);
 
-// receive it as a float value
-float in_ac_volt;
-if (studer_recv_check(&in_ac_volt, sizeof(in_ac_volt), it->object_id)) {
-	printf("Input AC Voltage: %f\n", in_ac_volt);
+// response in float with 4 bytes
+float float_val;
+if (studer_recv_check(&float_val, 4, objID)) {
+  printf("Input AC voltage: %.0f V\n", float_val);
 }
 ```
 

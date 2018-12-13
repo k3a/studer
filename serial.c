@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <fcntl.h> 
 #include <string.h>
+#include <strings.h>
 #include <termios.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -14,90 +15,72 @@
 
 int serial_fd = 0;
 
-static int set_interface_attribs (int fd, int speed, int parity)
+static int set_interface_attribs (int fd, int speed, serial_parity_t parity, int stop_bits)
 {
-        struct termios tty;
-        memset (&tty, 0, sizeof tty);
-        if (tcgetattr (fd, &tty) != 0)
-        {
-                error_message ("error %d from tcgetattr", errno);
-                return -1;
-        }
+  struct termios tio;
+  
+  bzero(&tio, sizeof(tio)); // clear struct for new port settings
 
-        cfsetospeed (&tty, speed);
-        cfsetispeed (&tty, speed);
+  tio.c_cflag = speed | \
+    CS8 /* 8 data bits */ | \
+    CLOCAL /* Ignore modem control lines */ | \
+    CREAD /* Enable receiver */;
 
-        tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     // 8-bit chars
-        // disable IGNBRK for mismatched speed tests; otherwise receive break
-        // as \000 chars
-        tty.c_iflag &= ~IGNBRK;         // disable break processing
-        tty.c_lflag = 0;                // no signaling chars, no echo,
-                                        // no canonical processing
-        tty.c_oflag = 0;                // no remapping, no delays
-        tty.c_cc[VMIN]  = 0;            // read doesn't block
-        tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+  if (stop_bits == 2) {
+    tio.c_cflag |= CSTOPB;
+  }
 
-        tty.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
+  if (parity > 0) {
+    tio.c_cflag |= PARENB;
+    if (parity & PARITY_ODD) {
+      tio.c_cflag |= PARODD;
+    }
+  }
+ 
+  // keep input, output and line flags empty
+  tio.c_iflag = 0;
+  tio.c_oflag = 0;
+  tio.c_lflag = 0; // will be noncanonical mode (ICANON not set)
 
-        tty.c_cflag |= (CLOCAL | CREAD);// ignore modem controls,
-                                        // enable reading
-        tty.c_cflag &= ~(PARENB | PARODD);      // shut off parity
-        tty.c_cflag |= parity;
-        tty.c_cflag &= ~CSTOPB;
-        //tty.c_cflag &= ~CRTSCTS; // disable RTS/CTS (hardware) flow control
+  // set blocking
+  tio.c_cc[VMIN]  = 1; // minimum number of characters for noncanonical read
+  tio.c_cc[VTIME] = 5; // 1.5 second read timeout
+ 
+  if (tcsetattr(fd, TCSANOW, &tio) != 0)
+  {
+    error_message ("tcsetattr error %d: %s", errno, strerror(errno));
+    return -1;
+  }
 
-        if (tcsetattr (fd, TCSANOW, &tty) != 0)
-        {
-                error_message ("error %d from tcsetattr", errno);
-                return -1;
-        }
-
-        return 0;
+  return 0;
 }
 
-static void set_blocking (int fd, int should_block)
-{
-        struct termios tty;
-        memset (&tty, 0, sizeof tty);
-        if (tcgetattr (fd, &tty) != 0)
-        {
-                error_message ("error %d from tggetattr", errno);
-                return;
-        }
-
-        tty.c_cc[VMIN]  = should_block ? 1 : 0;
-        tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
-
-        if (tcsetattr (fd, TCSANOW, &tty) != 0)
-                error_message ("error %d setting term attributes", errno);
-}
-
-int serial_init(const char* port_path, int speed, int parity) {
+int serial_init(const char* port_path, int speed, serial_parity_t parity, int stop_bits) {
   int ret;
 
-  serial_fd = open(port_path, O_RDWR | O_NOCTTY | O_SYNC);
+  serial_fd = open(port_path, O_RDWR | O_NOCTTY);
   if (serial_fd < 0) {
     error_message ("error %d opening %s: %s", errno, port_path, strerror(errno));
     return serial_fd;
   }
 
   // set speed and parity
-  if ((ret = set_interface_attribs(serial_fd, parity, 0)) < 0) { 
+  if ((ret = set_interface_attribs(serial_fd, speed, parity, stop_bits)) < 0) { 
     return ret;
   }
-
-  //set_blocking (fd, 0); // set non-blocking
 
   return 0;
 }
 
 // write to serial port size bytes from ptr
-void serial_write(const void* ptr, unsigned size) {
+int serial_write(const void* ptr, unsigned size) {
   int ret;
 
   if ((ret = write(serial_fd, ptr, size)) < 0) {
     error_message ("error writing to serial port: %s", strerror(errno));
   }
+
+  return ret;
 }
 
 // read size bytes from serial into ptr buffer

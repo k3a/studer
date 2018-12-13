@@ -217,4 +217,7 @@ void studer_send(uint16_t dest, uint8_t service_id, uint16_t object_type, uint32
 // receive a response from Studer interface
 bool studer_recv(void* mem, uint16_t len);
 
+// receive a response and check that it is responding to a specific object id
+bool studer_recv_check(void* mem, uint16_t len, uint32_t object_id);
+
 #endif /*__iot__studer__*/

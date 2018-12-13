@@ -240,7 +240,7 @@ bool studer_recv(void* mem, uint16_t len)
     return studer_recv_with_body(mem, len, NULL);
 }
 
-static bool studer_recv_check(void* mem, uint16_t len, uint32_t object_id)
+bool studer_recv_check(void* mem, uint16_t len, uint32_t object_id)
 {
     StuderBody body;
     bool ret = studer_recv_with_body(mem, len, &body);
