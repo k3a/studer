@@ -7,7 +7,9 @@
 int main() {
   printf("Studer example comm\n");
 
-  if (serial_init("/dev/ttyUSB2", B115200, PARITY_NONE, 1) != 0) {
+  // change serial port params according to your needs
+  // speed, parity and stop bit is documented in technical specification for Xcom-232i
+  if (serial_init("/dev/ttyUSB2", B38400/*B115200*/, PARITY_EVEN, 1) != 0) {
     return 1;
   }
 

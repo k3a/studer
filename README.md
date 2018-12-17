@@ -3,9 +3,9 @@
 This code implements a serial protocol used in Xcom-232i from Studer Innotec. 
 When seen as textual data, Studer protocol looks like AA3650001000E0762A2110BDB00100000CCF2.
 
-The code was created according to their protocol documentation http://www.studer-innotec.com/media/document/0/xcom_232i_user_manual_en.pdf and was used in a working project.
+The code was created according to their protocol documentation https://www.studer-innotec.com/media/document/0/technical-specification-xtender-serial-protocol-v1.6.30.pdf and was used in a working project based on ESP8266.
 
-Sharing it for use by others. Released under MIT license.
+Sharing it for use by others, released under MIT license.
 
 #### Usage:
 ```c
@@ -41,5 +41,6 @@ void serial_skip(unsigned char b);
 
 #### Notes
 
-It was taken from a working project but cleaned by hand. If you find a problem or you have a suggestion, please open a pull request. Thanks.
+It was taken from a working project but cleaned by hand. If you find a problem or you have a suggestion, please open a pull request. Thanks!
 
+There is now also an official scom library as part of Xcom-232i the tech spac zip which can be downloaded from https://www.studer-innotec.com/en/downloads/variotrack-series/. It may be a better fit for your project.
