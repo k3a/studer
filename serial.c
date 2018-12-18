@@ -89,14 +89,17 @@ int serial_write(const void* ptr, unsigned size) {
 
 // read size bytes from serial into ptr buffer
 serial_ret_t serial_read(void* ptr, unsigned size) {
-  int ret = read(serial_fd, ptr, size);
+  unsigned char* buf = (unsigned char*)ptr;
+  unsigned bytesRead = 0;
 
-  if (ret < 0) {
-    return SERIAL_ERR;
-  }
+  while (bytesRead < size) {
+    int ret = read(serial_fd, buf+bytesRead, size-bytesRead);
 
-  if (ret < size) {
-    return SERIAL_NOT_ENOUGH;
+    if (ret < 0) {
+      return SERIAL_ERR;
+    }
+
+    bytesRead += ret;
   }
 
   return SERIAL_OK;
