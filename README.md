@@ -7,23 +7,24 @@ In the older branch [v1](../../tree/v1), I was constructing and reading the fram
 This newer branch is using the official scom library provided by Studer, extended by helper
 functions and pre-allocated frame buffer.
 
-That can make debugging easier and since it is normally used with a single serial port,
-having a single pre-allocated buffer should be acceptable.
+That decouples the code from the serial port API and makes debugging easier.
 
 The old branch should still work but this one should be preferred as I don't actively
 use the old branch anymore.
 
 You can use this code as you see fit, it is released under MIT license.
 
-#### Usage
+### Usage
 
-Please see the example app and comments in the scomlib_extra.h for the API usage.
+Please see the [example app](example) and comments
+in the [scomlib_extra.h](scomlib_extra/scomlib_extra.h) for the API usage.
 
-#### Contributing
+### Contributing
 
 Feel free to submit pull requests to improve the code, for example extending enums with object IDs.
+The recommended editor to use is Visual Studio Code / VSCodium.
 
-#### Reference
+### Reference
 
 The latest scom library and protocol spec can be downloaded
 from [Software and Updates](https://www.studer-innotec.com/en/downloads/variotrack-series/) section.

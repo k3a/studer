@@ -2,8 +2,7 @@
 
 const char *scomx_err2str(scom_error_t err)
 {
-    switch (err)
-    {
+    switch (err) {
     case SCOM_ERROR_NO_ERROR:
         return "no error";
     case SCOM_ERROR_INVALID_FRAME:

@@ -1,0 +1,7 @@
+UseTab: false
+IndentWidth: 4
+ColumnLimit: 170
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterControlStatement: Never
+  AfterFunction: true
