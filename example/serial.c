@@ -42,13 +42,13 @@ static int set_interface_attribs (int fd, int speed, serial_parity_t parity, int
   }
  
   // keep input, output and line flags empty
-  tio.c_iflag = 0;
+  tio.c_iflag = INPCK; // enable parity check
   tio.c_oflag = 0;
   tio.c_lflag = 0; // will be noncanonical mode (ICANON not set)
 
   // set blocking
-  tio.c_cc[VMIN]  = 1; // minimum number of characters for noncanonical read
-  tio.c_cc[VTIME] = 5; // 1.5 second read timeout
+  tio.c_cc[VMIN]  = 255; // minimum number of characters for noncanonical read
+  tio.c_cc[VTIME] = 20; // 2 second read timeout
  
   if (tcsetattr(fd, TCSANOW, &tio) != 0)
   {
@@ -78,41 +78,26 @@ int serial_init(const char* port_path, int speed, serial_parity_t parity, int st
 
 // write to serial port size bytes from ptr
 int serial_write(const void* ptr, unsigned size) {
-  int ret;
-
-  if ((ret = write(serial_fd, ptr, size)) < 0) {
-    error_message ("error writing to serial port: %s", strerror(errno));
-  }
-
-  return ret;
+  return write(serial_fd, ptr, size);
 }
 
 // read size bytes from serial into ptr buffer
-serial_ret_t serial_read(void* ptr, unsigned size) {
-  unsigned char* buf = (unsigned char*)ptr;
-  unsigned bytesRead = 0;
-
-  while (bytesRead < size) {
-    int ret = read(serial_fd, buf+bytesRead, size-bytesRead);
-
-    if (ret < 0) {
-      return SERIAL_ERR;
-    }
-
-    bytesRead += ret;
-  }
-
-  return SERIAL_OK;
-}
-
-// read and skip bytes until your receive a byte b. Skip this byte as well and return. 
-void serial_skip(unsigned char b) {
-  unsigned char readByte = 123;
-  serial_ret_t ret;
-
-  while ( (ret = serial_read(&readByte, 1) ) == SERIAL_OK ) {
-    if (readByte == b) {
-      break; // done reading
-    }
-  }
+int serial_read(void* ptr, unsigned size) {
+ 	  unsigned char* buf = (unsigned char*)ptr;
+	  unsigned bts_read = 0;
+	
+	  while (bts_read < size) {
+	    int ret = read(serial_fd, buf+bts_read, size-bts_read);
+	
+	    if (ret < 0) {
+	      return ret;
+	    } else if (ret == 0) {
+        // timeout
+        return bts_read;
+      }
+	
+	    bts_read += ret;
+	  }
+	
+	  return bts_read;
 }

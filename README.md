@@ -1,46 +1,32 @@
-# Studer Solar Equipment Protcol Implementation
+# ScomLib Extra
 
-This code implements a serial protocol used in Xcom-232i from Studer Innotec. 
+This code makes it easier to use Xcom-232i from Studer Innotec. 
 When seen as textual data, Studer protocol looks like AA3650001000E0762A2110BDB00100000CCF2.
 
-The code was created according to their protocol documentation https://www.studer-innotec.com/media/document/0/technical-specification-xtender-serial-protocol-v1.6.30.pdf and was used in a working project based on ESP8266.
+In the older branch [v1](../../tree/v1), I was constructing and reading the frames directly.
+This newer branch is using the official scom library provided by Studer, extended by helper
+functions and pre-allocated frame buffer.
 
-Sharing it for use by others, released under MIT license.
+That can make debugging easier and since it is normally used with a single serial port,
+having a single pre-allocated buffer should be acceptable.
 
-#### Usage:
-```c
-// input ac voltage command
-int objID = OI_IN_AC_VOLT;
-studer_send(DEST_XTM(0), SVC_READ_PROPERTY, OT_SYSTEM_STATE, objID, PI_VALUE);
+The old branch should still work but this one should be preferred as I don't actively
+use the old branch anymore.
 
-// response in float with 4 bytes
-float float_val;
-if (studer_recv_check(&float_val, 4, objID)) {
-  printf("Input AC voltage: %.0f V\n", float_val);
-}
-```
+You can use this code as you see fit, it is released under MIT license.
 
-#### Serial IO:
-You need to provide serial port functions.
-An example implementation for Linux/BSD is provided.
+#### Usage
 
-```c
-#define SERIAL_OK 0
-typedef unsigned serial_ret_t;
+Please see the example app and comments in the scomlib_extra.h for the API usage.
 
-// write to serial port size bytes from ptr
-// returns number of bytes read or negative number indicating an error
-int serial_write(const void* ptr, unsigned size);
+#### Contributing
 
-// read size bytes from serial into ptr buffer
-serial_ret_t serial_read(void* ptr, unsigned size);
+Feel free to submit pull requests to improve the code, for example extending enums with object IDs.
 
-// read and skip bytes until your receive a byte b. Skip this byte as well and return. 
-void serial_skip(unsigned char b);
-```
+#### Reference
 
-#### Notes
+The latest scom library and protocol spec can be downloaded
+from [Software and Updates](https://www.studer-innotec.com/en/downloads/variotrack-series/) section.
 
-It was taken from a working project but cleaned by hand. If you find a problem or you have a suggestion, please open a pull request. Thanks!
-
-There is now also an official scom library as part of Xcom-232i the tech spac zip which can be downloaded from https://www.studer-innotec.com/en/downloads/variotrack-series/. It may be a better fit for your project.
+Full list of object IDs can be found in "Technical specification - Xtender serial protocol appendix"
+PDF in the same zip file.
